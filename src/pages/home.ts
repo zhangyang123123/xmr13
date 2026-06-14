@@ -144,11 +144,13 @@ document.addEventListener('paste', (e) => {
     if (item.kind === 'file') {
       const file = item.getAsFile();
       if (file) {
-        if (!file.name || file.name === 'image.png' || file.name.startsWith('image')) {
-          const ext = getExtensionFromMime(file.type);
-          Object.defineProperty(file, 'name', { value: 'pasted-' + Date.now() + ext, writable: false });
-        }
-        files.push(file);
+        const ext = getExtensionFromMime(file.type);
+        const needsRename = !file.name || file.name === 'image.png' || file.name === 'image.jpeg' ||
+                           file.name === 'image.gif' || file.name === 'image.webp' ||
+                           file.name.startsWith('image') || !file.name.includes('.');
+        const newName = needsRename ? 'pasted-' + Date.now() + ext : file.name;
+        const renamedFile = new File([file], newName, { type: file.type });
+        files.push(renamedFile);
       }
     }
   }
